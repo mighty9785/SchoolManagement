@@ -1,0 +1,134 @@
+<div class="flex items-center justify-between flex-wrap gap-2 mb-6">
+  <div>
+    <h4 class="text-slate-900 text-lg font-medium mb-2">Student Enquiry</h4>
+    <div class="md:flex hidden items-center gap-3 text-sm font-semibold">
+      <span class="text-slate-700">Enquiry</span>
+      <i class="material-symbols-rounded text-xl text-slate-500">chevron_right</i>
+      <span class="text-slate-700">Add Enquiry</span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-5">
+
+    <!-- ================= BASIC DETAILS ================= -->
+    <div class="mb-6 border rounded">
+      <div class="bg-blue-600 text-white px-4 py-2 font-semibold rounded-t">
+        Basic Details
+      </div>
+
+      <form [formGroup]="enquiryForm" class="p-4">
+        <div class="grid 2xl:grid-cols-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
+
+          <input class="form-input" formControlName="enquiryNumber" placeholder="Enquiry Number" />
+          <input class="form-input" formControlName="tokenNo" placeholder="Form / Token No" />
+
+          <input class="form-input" formControlName="firstName" placeholder="First Name *" />
+          <input class="form-input" formControlName="middleName" placeholder="Middle Name" />
+          <input class="form-input" formControlName="lastName" placeholder="Last Name" />
+
+          <input class="form-input" formControlName="fatherName" placeholder="Father Name *" />
+          <input class="form-input" formControlName="motherName" placeholder="Mother Name *" />
+
+          <input class="form-input" formControlName="mobile" placeholder="Mobile *" />
+
+          <select class="form-input" formControlName="enquiryClass">
+            <option value="">Enquiry for Class *</option>
+            <option value="M">New</option>
+            <option value="F">Old</option>
+          </select>
+
+          <input class="form-input" formControlName="district" placeholder="District" />
+
+          <select class="form-input" formControlName="gender">
+            <option value="">Gender *</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+
+          <input class="form-input" formControlName="penNo" placeholder="PEN No." />
+
+          <select class="form-input" formControlName="enquiryType">
+
+            <option value="">-- Select Enquiry Type * --</option>
+
+            <option *ngFor="let item of enquiryTypes" [value]="item.CommonMasterId">
+              {{ item.Title }}
+            </option>
+
+          </select>
+
+
+          <select class="form-input" formControlName="category">
+
+            <option value="">-- Select Category --</option>
+
+            <option *ngFor="let item of categories" [value]="item.CommonMasterId">
+              {{ item.Title }}
+            </option>
+
+          </select>
+
+
+          <select class="form-input" formControlName="caste">
+
+            <option value="">-- Select Caste --</option>
+
+            <option *ngFor="let item of castes" [value]="item.CommonMasterId">
+              {{ item.Title }}
+            </option>
+
+          </select>
+
+
+          <input class="form-input" formControlName="referenceRemark" placeholder="Reference Remark" />
+
+          <input class="form-input" formControlName="tenthBoard" placeholder="10th Board Name" />
+          <input class="form-input" formControlName="tenthPercentage" placeholder="10th Percentage" />
+
+          <input class="form-input" formControlName="twelfthBoard" placeholder="12th Board Name" />
+          <input class="form-input" formControlName="twelfthPercentage" placeholder="12th Percentage" />
+
+          <input class="form-input" formControlName="studentAadhaar" placeholder="Student Aadhaar No." />
+          <input class="form-input" formControlName="motherAadhaar" placeholder="Mother Aadhaar No." />
+          <input class="form-input" formControlName="fatherAadhaar" placeholder="Father Aadhaar No." />
+
+        </div>
+      </form>
+    </div>
+
+    <!-- ================= ACTIVITY LOG ================= -->
+    <div class="border rounded">
+      <div class="bg-blue-600 text-white px-4 py-2 font-semibold rounded-t">
+        Activity Log
+      </div>
+
+      <div class="p-4 grid md:grid-cols-3 grid-cols-1 gap-4">
+        <textarea rows="3" class="form-input md:col-span-2" formControlName="remark" placeholder="Remark">
+        </textarea>
+
+        <div class="space-y-3">
+          <select class="form-input" formControlName="enquiryStatus">
+            <option value="OPEN">OPEN</option>
+            <option value="CLOSED">CLOSED</option>
+          </select>
+
+          <input type="date" class="form-input" formControlName="reminderDate" />
+          <input class="form-input" formControlName="assignTo" placeholder="Assign To" />
+          <input class="form-input" formControlName="closeReason" placeholder="Close Reason" />
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 px-4 pb-4">
+        <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded">
+          Cancel
+        </button>
+        <button type="button" class="btn bg-blue-600 text-white px-4 py-2 rounded" [disabled]="enquiryForm.invalid" (click)="SaveEnquiry()">
+          Save Enquiry
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
