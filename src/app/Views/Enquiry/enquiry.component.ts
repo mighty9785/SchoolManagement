@@ -4,35 +4,15 @@ import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
-
-/* ===== CONSTANTS ===== */
-import {
-  EnumRole,
-  GlobalConstants,
-  enumExamStudentStatus
-} from '../../Common/GlobalConstants';
-
+import { EnumRole, GlobalConstants, enumExamStudentStatus } from '../../Common/GlobalConstants';
 import { SweetAlert2 } from '../../Common/SweetAlert2';
 import { AppsettingService } from '../../Common/appsetting.service';
-
-/* ===== SERVICES ===== */
 import { DropdownValidators } from '../../Services/CustomValidators/custom-validators.service';
 import { CommonFunctionService } from '../../Services/CommonFunction/common-function.service';
 import { EnquiryService } from '../../Services/Enquiry/Enquiry.service';
 import { LoaderService } from '../../Services/Loader/loader.service';
-
-/* ===== MODELS ===== */
-import {
-  StudentMasterModel,
-  Student_DataModel,
-  M_StudentMaster_QualificationDetailsModel
-} from '../../Models/StudentMasterModels';
-
-import {
-  PreExamStudentDataModel,
-  PreExam_UpdateEnrollmentNoModel
-} from '../../Models/PreExamStudentDataModel';
-
+import { StudentMasterModel, Student_DataModel, M_StudentMaster_QualificationDetailsModel} from '../../Models/StudentMasterModels';
+import { PreExamStudentDataModel, PreExam_UpdateEnrollmentNoModel} from '../../Models/PreExamStudentDataModel';
 import { LoginDataModel } from '../../Models/SSOLoginDataModel';
 import { SubjectSearchModel } from '../../Models/SubjectMasterDataModel';
 import { CommonSubjectDetailsMasterModel } from '../../Models/CommonSubjectDetailsMasterModel';
@@ -114,6 +94,7 @@ export class EnquiryComponent implements OnInit {
 
   /* ================= INIT ================= */
   async ngOnInit(): Promise<void> {
+    debugger;
     this.buildSearchForm();
     this.buildEnquiryForm();
     this.buildEditStudentForm();
@@ -127,14 +108,12 @@ export class EnquiryComponent implements OnInit {
       this.loginData = JSON.parse(user);
     }
     console.log('Categories:', this.categories);
-console.log('Castes:', this.castes);
-console.log('Enquiry Types:', this.enquiryTypes);
+    console.log('Castes:', this.castes);
+    console.log('Enquiry Types:', this.enquiryTypes);
 
 
     await this.loadCommonMasters();
   }
-
-  /* ================= FORM BUILDERS ================= */
 
   private buildSearchForm(): void {
     this.searchForm = this.fb.group({
@@ -155,19 +134,22 @@ console.log('Enquiry Types:', this.enquiryTypes);
 
   private buildEnquiryForm(): void {
     this.enquiryForm = this.fb.group({
-      enquiryNumber: [''],
-      tokenNo: [''],
+      // enquiryNumber: [''],
+      // tokenNo: [''],
 
       firstName: ['', Validators.required],
       middleName: [''],
       lastName: [''],
+       profile: [''],
 
       fatherName: ['', Validators.required],
       motherName: ['', Validators.required],
       mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-
+       email: [''],
+      fathermobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       enquiryClass: ['', Validators.required],
-      district: [''],
+      stateId: [''],
+      districtId: [''],
       gender: ['', Validators.required],
       penNo: [''],
 
@@ -187,7 +169,8 @@ console.log('Enquiry Types:', this.enquiryTypes);
       fatherAadhaar: [''],
 
       remark: [''],
-      enquiryStatus: ['OPEN'],
+      EnquiryTypeId: ['', Validators.required],
+      enquiryStatus: ['',  Validators.required],
       reminderDate: [null],
       assignTo: [''],
       closeReason: ['']
@@ -220,7 +203,6 @@ console.log('Enquiry Types:', this.enquiryTypes);
     });
   }
 
-  /* ================= MASTER API ================= */
 
   private async loadCommonMasters(): Promise<void> {
     const categoryRes = await this.enquiryService.GetCommonMasterData(1);
