@@ -36,8 +36,18 @@
 
           <select class="form-input" formControlName="gender">
             <option value="">Gender *</option>
-            <option value="M">Male</option>
-            <option value="F">Female</option>
+            <option value="1">Male</option>
+            <option value="2">Female</option>
+            <option value="3">Others</option>
+          </select>
+
+          <select class="form-input" formControlName="caste">
+            <option value="">-- Select Caste --</option>
+
+            <option *ngFor="let item of castes" [value]="item.CommonMasterId">
+              {{ item.Title }}
+            </option>
+
           </select>
 
           <select class="form-input" formControlName="category">
@@ -50,30 +60,31 @@
 
           </select>
 
-          <select class="form-input" formControlName="caste">
-
-            <option value="">-- Select Caste --</option>
-
-            <option *ngFor="let item of castes" [value]="item.CommonMasterId">
-              {{ item.Title }}
-            </option>
-
-          </select>
-
           <select class="form-input" formControlName="stateId">
             <option value="">State *</option>
-            <option value="M">Male</option>
-            <option value="F">Female</option>
+            <option value="1">Rajsthan</option>
+            <option value="2">Maharastra</option>
           </select>
 
           <select class="form-input" formControlName="districtId">
             <option value="">District *</option>
-            <option value="M">Male</option>
-            <option value="F">Female</option>
+            <option value="1">Jhunjhunu</option>
+            <option value="2">Jaipur</option>
+            <option value="3">Mumbai</option>
+            <option value="4">Pune</option>
           </select>
-
-          <input type="file" class="form-input" formControlName="profile" placeholder="Profile Image" />
-
+ 
+          <input type="file" class="form-input" formControlName="profile" (change)="onFileChange($event)" accept="image/*"/>
+<div *ngIf="previewUrl">
+  <p>{{ uploadedFileName }}</p>
+  <img
+    [src]="previewUrl"
+    alt="Thumbnail"
+    width="120"
+    height="120"
+    style="object-fit: cover"
+  />
+</div>
           <input class="form-input" formControlName="tenthBoard" placeholder="10th Board Name" />
           <input class="form-input" formControlName="tenthPercentage" placeholder="10th Percentage" />
 
@@ -95,8 +106,9 @@
         <div class="p-4 grid 2xl:grid-cols-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
           <select class="form-input" formControlName="enquiryClass">
             <option value="">Enquiry for Class *</option>
-            <option value="M">New</option>
-            <option value="F">Old</option>
+            <option *ngFor="let item of classType" [value]="item.ClassId">
+              {{ item.ClassName }}
+            </option>
           </select>
 
           <select class="form-input" formControlName="enquiryType">
@@ -111,7 +123,7 @@
 
           <select class="form-input" formControlName="EnquiryTypeId">
             <option value="">-- Select Refrence Type --</option>
-             <option *ngFor="let item of enquiryTypes" [value]="item.CommonMasterId">
+             <option *ngFor="let item of enquiryRefrenceType" [value]="item.CommonMasterId">
               {{ item.Title }}
             </option>
           </select>

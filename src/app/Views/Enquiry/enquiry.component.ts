@@ -31,13 +31,9 @@ export class EnquiryComponent implements OnInit {
   GlobalConstants = GlobalConstants;
   EnumRole = EnumRole;
   enumExamStudentStatus = enumExamStudentStatus;
+  previewUrl: string | null = null;
+  uploadedFileName = '';
 
-  /* ================= USER / STATE ================= */
-  userId = 0;
-  roleId = 0;
-  state = -1;
-
-  /* ================= MESSAGES ================= */
   messages: string[] = [];
   errorMessages: string[] = [];
 
@@ -45,7 +41,10 @@ export class EnquiryComponent implements OnInit {
   categories: any[] = [];
   castes: any[] = [];
   enquiryTypes: any[] = [];
-
+  classType: any[] = [];
+  enquiryStatus: any[] = [];
+  enquiryRefrenceType: any[] = [];
+    
   /* ================= DATA ================= */
   students: StudentMasterModel[] = [];
   studentDataList: Student_DataModel[] = [];
@@ -95,10 +94,7 @@ export class EnquiryComponent implements OnInit {
   /* ================= INIT ================= */
   async ngOnInit(): Promise<void> {
     debugger;
-    this.buildSearchForm();
     this.buildEnquiryForm();
-    this.buildEditStudentForm();
-    this.buildUpdateEnrollmentForm();
 
     this.studentRequest.commonSubjectDetails = [];
     this.studentRequest.QualificationDetails = [];
@@ -115,28 +111,8 @@ export class EnquiryComponent implements OnInit {
     await this.loadCommonMasters();
   }
 
-  private buildSearchForm(): void {
-    this.searchForm = this.fb.group({
-      applicationNo: [''],
-      instituteId: [''],
-      streamId: [''],
-      semesterId: [''],
-      studentTypeId: [''],
-      managementId: [''],
-      status: [''],
-      subjectStatus: [''],
-      bridge: [''],
-      examCategoryId: [''],
-      studentName: [''],
-      mobileNo: ['']
-    });
-  }
-
   private buildEnquiryForm(): void {
     this.enquiryForm = this.fb.group({
-      // enquiryNumber: [''],
-      // tokenNo: [''],
-
       firstName: ['', Validators.required],
       middleName: [''],
       lastName: [''],
@@ -146,7 +122,7 @@ export class EnquiryComponent implements OnInit {
       motherName: ['', Validators.required],
       mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
        email: [''],
-      fathermobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
+      fatherMobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       enquiryClass: ['', Validators.required],
       stateId: [''],
       districtId: [''],
@@ -177,33 +153,6 @@ export class EnquiryComponent implements OnInit {
     });
   }
 
-  private buildEditStudentForm(): void {
-    this.editStudentForm = this.fb.group({
-      studentName: [{ value: '', disabled: true }, Validators.required],
-      fatherName: [{ value: '', disabled: true }, Validators.required],
-      motherName: [{ value: '', disabled: true }, Validators.required],
-      gender: [{ value: '', disabled: true }, Validators.required],
-      mobileNo: ['', Validators.required],
-      instituteId: [{ value: '', disabled: true }, DropdownValidators],
-      streamId: [{ value: '', disabled: true }, DropdownValidators],
-      dob: [{ value: '', disabled: true }, Validators.required],
-      address: [''],
-      isVerified: [false]
-    });
-  }
-
-  private buildUpdateEnrollmentForm(): void {
-    this.updateEnrollmentForm = this.fb.group({
-      enrollmentNo: [{ value: '', disabled: true }, Validators.required],
-      instituteId: ['', DropdownValidators],
-      branchId: ['', DropdownValidators],
-      orderNo: ['', Validators.required],
-      orderDate: ['', Validators.required],
-      updatedDate: ['', Validators.required]
-    });
-  }
-
-
   private async loadCommonMasters(): Promise<void> {
     const categoryRes = await this.enquiryService.GetCommonMasterData(1);
     if (categoryRes?.Status) {
@@ -219,41 +168,47 @@ export class EnquiryComponent implements OnInit {
     if (enquiryTypeRes?.Status) {
       this.enquiryTypes = enquiryTypeRes.Result ?? [];
     }
+
+    const enquiryStatusRes = await this.enquiryService.GetCommonMasterData(5);
+    if (enquiryStatusRes?.Status) {
+      this.enquiryStatus = enquiryStatusRes.Result ?? [];
+    }
+
+    const enquiryRefrenceRes = await this.enquiryService.GetCommonMasterData(6);
+    if (enquiryRefrenceRes?.Status) {
+      this.enquiryRefrenceType = enquiryRefrenceRes.Result ?? [];
+    }
+
+    const classTypeRes = await this.enquiryService.GetClassData(0);
+    if (classTypeRes?.Status) {
+      this.classType = classTypeRes.Result ?? [];
+    }
   }
 
-  /* ================= SAVE ENQUIRY ================= */
+  async onFileChange(event: Event): Promise<void> {
+    debugger;
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
 
+    const file = input.files[0];
 
-//   async SaveEnquiry(): Promise<void> {
+    // Set file in existing form control
+    //this.enquiryForm.get('profile')?.setValue(file);
 
-//   if (this.enquiryForm.invalid) {
-//     this.enquiryForm.markAllAsTouched();
-//     return;
-//   }
+    const formData = new FormData();
+    formData.append('file', file);
 
-//   const payload = this.enquiryForm.value;
+    try {
+      const result = await this.enquiryService.upload(formData);
 
-//   try {
-//     this.isLoading = true;
+      // Use API response
+      this.previewUrl = result.imageUrl;
+      this.uploadedFileName = result.fileName || file.name;
 
-//     const res = await this.enquiryService.saveEnquiry(payload);
-
-//     if (res?.Status) {
-//       this.toastr.success('Enquiry saved successfully');
-//       this.enquiryForm.reset({
-//         enquiryStatus: 'OPEN'
-//       });
-//     } else {
-//       this.toastr.error(res?.Message || 'Failed to save enquiry');
-//     }
-
-//   } catch (error) {
-//     console.error(error);
-//     this.toastr.error('Something went wrong while saving enquiry');
-//   } finally {
-//     this.isLoading = false;
-//   }
-// }
+    } catch (err) {
+      console.error('File upload failed', err);
+    }
+  }
 
 async SaveEnquiry(): Promise<void> {
 
@@ -264,52 +219,9 @@ async SaveEnquiry(): Promise<void> {
 
   const formValue = this.enquiryForm.value;
 
-  const payload = {
-  EnquiryId: 0,
-  EnquiryNo: '',
-  TokenNo: '',
-
-  FirstName: formValue.firstName ?? '',
-  MiddleName: formValue.middleName ?? '',
-  LastName: formValue.lastName ?? '',
-  FatherName: formValue.fatherName ?? '',
-  MotherName: formValue.motherName ?? '',
-
-  EnquiryForClassId: formValue.enquiryForClassId ?? 0,
-  StateId: formValue.stateId ?? 0,
-  DistrictId: formValue.districtId ?? 0,
-  Address: formValue.address ?? '',
-
-  GenderId: formValue.genderId ?? 0,
-  ReferenceTypeId: formValue.referenceTypeId ?? 0,
-  ReferenceRemark: formValue.referenceRemark ?? '',
-
-  EnquiryTypeId: formValue.enquiryTypeId ?? 0,
-  CategoryId: formValue.categoryId ?? 0,
-  CasteId: formValue.casteId ?? 0,
-
-  Class10BoardName: formValue.class10BoardName ?? '',
-  Class10PercentageGrade: formValue.class10PercentageGrade ?? '',
-  Class12BoardName: formValue.class12BoardName ?? '',
-  Class12PercentageGrade: formValue.class12PercentageGrade ?? '',
-
-  StatusId: 1,
-  Remark: formValue.remark ?? '',
-  ReminderDate: formValue.reminderDate ?? null,
-
-  MobileNo: formValue.mobileNo ?? '',
-  FatherMobileNo: formValue.fatherMobileNo ?? '',
-  EmailAddress: formValue.emailAddress ?? '',
-  Photo: '',
-  AssignedTo: 0
-};
-
-
-  console.log('FINAL API PAYLOAD ', payload);
-
   try {
     this.isLoading = true;
-    const res = await this.enquiryService.saveEnquiry(payload);
+    const res = await this.enquiryService.saveEnquiry(formValue);
 
     console.log('API RESPONSE ', res);
 

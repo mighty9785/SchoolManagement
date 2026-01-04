@@ -17,6 +17,7 @@ export class EnquiryService {
   private readonly enquiryApiUrl: string;
   private readonly masterApiUrl: string;
   private readonly EnquirySaveApiUrl: string;
+  private readonly FileSaveApiUrl: string;
 
 
   constructor(
@@ -26,7 +27,7 @@ export class EnquiryService {
     this.enquiryApiUrl = `${this.appsettingConfig.apiURL}Enquiry`;
     this.masterApiUrl = `${this.appsettingConfig.apiURL}Master`;
     this.EnquirySaveApiUrl = `${this.appsettingConfig.apiURL}Enquiry`;
-
+    this.FileSaveApiUrl = `${this.appsettingConfig.apiURL}CommonService`;
   }
 
   /* ================= HEADERS ================= */
@@ -34,7 +35,7 @@ export class EnquiryService {
   private get headersOptions() {
     return {
       headers: new HttpHeaders({
-        'Content-Type': 'application/json',
+        Accept: '*/*',
         Authorization: `Bearer ${localStorage.getItem('authtoken') || ''}`
       })
     };
@@ -47,22 +48,7 @@ export class EnquiryService {
     return throwError(() => error);
   }
 
-  /* ================= ENQUIRY APIS ================= */
-
-  async getPreExamStudent(
-    request: PreExamStudentDataModel
-  ): Promise<any> {
-    return firstValueFrom(
-      this.http
-        .post<any>(
-          `${this.enquiryApiUrl}/GetPreExamStudent`,
-          request,
-          this.headersOptions
-        )
-        .pipe(catchError(this.handleError))
-    );
-  }
-
+ 
   /* ================= COMMON MASTER API ================= */
 
   async GetCommonMasterData(
@@ -72,6 +58,19 @@ export class EnquiryService {
       this.http
         .get<any>(
           `${this.masterApiUrl}/GetCommonMasterData?CommonMasterId=${commonMasterId}`,
+          this.headersOptions
+        )
+        .pipe(catchError(this.handleError))
+    );
+  }
+
+   async GetClassData(
+    ClassTypeId: number
+  ): Promise<any> {
+    return firstValueFrom(
+      this.http
+        .get<any>(
+          `${this.masterApiUrl}/GetClassData?ClassTypeId=${ClassTypeId}`,
           this.headersOptions
         )
         .pipe(catchError(this.handleError))
@@ -130,5 +129,10 @@ async saveEnquiry(request: any): Promise<any> {
   );
 }
 
+ async upload(data: FormData): Promise<any> {
+    return await firstValueFrom(
+      this.http.post<any>(`${this.FileSaveApiUrl}/FileUploader`, data, this.headersOptions)
+    );
+  }
 
 }
