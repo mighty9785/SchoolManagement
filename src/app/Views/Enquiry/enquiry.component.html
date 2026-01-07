@@ -21,6 +21,9 @@
 
         <div class="p-4 grid 2xl:grid-cols-4 xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4">
 
+            <!-- LEFT SIDE : FORM INPUTS -->
+  <div class="lg:col-span-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- <input class="form-input" formControlName="enquiryNumber" placeholder="Enquiry Number" />
           <input class="form-input" formControlName="tokenNo" placeholder="Form / Token No" /> -->
 
@@ -33,6 +36,25 @@
 
           <input class="form-input" formControlName="mobile" placeholder="Mobile *" />
           <input class="form-input" formControlName="email" placeholder="Email *" />
+           </div>
+  </div>
+            <!-- RIGHT SIDE : IMAGE UPLOAD -->
+  <div class="lg:col-span-4">
+    <label class="block mb-2 font-medium">Profile Image</label>
+
+    <input
+      type="file"
+      class="dropify"
+      data-height="220"
+      accept="image/*"
+      (change)="onFileChange($event)"
+    />
+
+    <p *ngIf="uploadedFileName" class="mt-2 text-sm text-gray-600">
+      {{ uploadedFileName }}
+    </p>
+  </div>
+
 
           <select class="form-input" formControlName="gender">
             <option value="">Gender *</option>
@@ -74,17 +96,7 @@
             <option value="4">Pune</option>
           </select>
  
-          <input type="file" class="form-input" formControlName="profile" (change)="onFileChange($event)" accept="image/*"/>
-<div *ngIf="previewUrl">
-  <p>{{ uploadedFileName }}</p>
-  <img
-    [src]="previewUrl"
-    alt="Thumbnail"
-    width="120"
-    height="120"
-    style="object-fit: cover"
-  />
-</div>
+ 
           <input class="form-input" formControlName="tenthBoard" placeholder="10th Board Name" />
           <input class="form-input" formControlName="tenthPercentage" placeholder="10th Percentage" />
 
@@ -160,7 +172,7 @@
         <button type="button" class="btn bg-gray-400 text-white px-4 py-2 rounded">
           Cancel
         </button>
-        <button type="button" class="btn bg-blue-600 text-white px-4 py-2 rounded" [disabled]="enquiryForm.invalid" (click)="SaveEnquiry()">
+        <button type="button" class="btn bg-blue-600 text-white px-4 py-2 rounded" (click)="SaveEnquiry()">
           Save Enquiry
         </button>
       </div>

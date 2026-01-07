@@ -19,19 +19,24 @@ import { CommonSubjectDetailsMasterModel } from '../../Models/CommonSubjectDetai
 import { ReportBasedModel } from '../../Models/ReportBasedDataModel';
 import { DocumentDetailsModel } from '../../Models/DocumentDetailsModel';
 
+declare var $: any;
 @Component({
   selector: 'app-enquiry',
   templateUrl: './enquiry.component.html',
   styleUrls: ['./enquiry.component.css'],
-  standalone: false
+  standalone: false,
+  
 })
+
+
 export class EnquiryComponent implements OnInit {
+  private readonly FileSaveApiUrl: string = "";
 
   /* ================= CONSTANTS ================= */
   GlobalConstants = GlobalConstants;
   EnumRole = EnumRole;
   enumExamStudentStatus = enumExamStudentStatus;
-  previewUrl: string | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
   uploadedFileName = '';
 
   messages: string[] = [];
@@ -88,8 +93,15 @@ export class EnquiryComponent implements OnInit {
     private swal: SweetAlert2,
     private route: ActivatedRoute,
     public appSettings: AppsettingService,
-    private http: HttpClient
-  ) {}
+    private http: HttpClient,
+    private appsettingConfig: AppsettingService
+  ) {
+     this.FileSaveApiUrl = `${this.appsettingConfig.FileURL}`;
+  }
+
+    ngAfterViewInit(): void {
+    $('.dropify').dropify();
+  }
 
   /* ================= INIT ================= */
   async ngOnInit(): Promise<void> {
@@ -129,7 +141,6 @@ export class EnquiryComponent implements OnInit {
       gender: ['', Validators.required],
       penNo: [''],
 
-      enquiryType: ['', Validators.required],
       category: [''],
       caste: [''],
 
@@ -201,21 +212,26 @@ export class EnquiryComponent implements OnInit {
     try {
       const result = await this.enquiryService.upload(formData);
 
-      // Use API response
-      this.previewUrl = result.imageUrl;
-      this.uploadedFileName = result.fileName || file.name;
+      if(result.Status){
+          this.previewUrl = this.FileSaveApiUrl + result.Result.FilePath;
+          this.uploadedFileName = result.fileName || file.name;
+          //this.enquiryForm.profile = result.Result.FilePath;
+      }
+      else{
+        this.toastr.error(result?.Message || 'Failed to Upload image');
+      }
 
     } catch (err) {
-      console.error('File upload failed', err);
+      this.toastr.error('File upload failed');
     }
   }
 
 async SaveEnquiry(): Promise<void> {
-
-  if (this.enquiryForm.invalid) {
-    this.enquiryForm.markAllAsTouched();
-    return;
-  }
+debugger;
+  // if (this.enquiryForm.invalid) {
+  //   this.enquiryForm.markAllAsTouched();
+  //   return;
+  // }
 
   const formValue = this.enquiryForm.value;
 

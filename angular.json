@@ -31,13 +31,15 @@
               "src/assets/home/css/fontawesome/css/font-awesome.min.css",
               "src/assets/home/css/animate.min.css",
               "src/assets/home/css/bootstrap-icons.css",
-              "./node_modules/@ng-select/ng-select/themes/default.theme.css"
+              "./node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "./node_modules/dropify/dist/css/dropify.min.css"
             ],
             "scripts": [
               "src/assets/home/js/jquery-3.7.1.min.js",
               "src/assets/js/custom/customfunction.js",
               "src/assets/js/custom/CommonFileUploader.js",
-              "src/assets/home/js/bootstrap.bundle.min.js"
+              "src/assets/home/js/bootstrap.bundle.min.js",
+              "./node_modules/dropify/dist/js/dropify.min.js"
             ]
           },
           "configurations": {

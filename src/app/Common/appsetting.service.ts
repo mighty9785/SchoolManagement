@@ -12,6 +12,7 @@ export class AppsettingService {
   // appsetting json data set
   public AppName: string = "";
   public apiURL: string = "https://api.prognextech.com/api/";
+  public FileURL: string = "https://api.prognextech.com/";
   public BacktoSSOURL: string = "";
   public BacktoSSOURL_Logout: string = "";
   public RootPathURL: string = "";
