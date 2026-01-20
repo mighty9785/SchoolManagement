@@ -38,7 +38,7 @@ export class EnquiryComponent implements OnInit {
   enumExamStudentStatus = enumExamStudentStatus;
   previewUrl: string | ArrayBuffer | null = null;
   uploadedFileName = '';
-
+  updatedFileName = '';
   messages: string[] = [];
   errorMessages: string[] = [];
 
@@ -164,6 +164,51 @@ export class EnquiryComponent implements OnInit {
     });
   }
 
+  private mapFormToEnquiryPayload() {
+  const f = this.enquiryForm.value;
+
+  return {
+    EnquiryId: 0,
+    EnquiryNo: '',
+    TokenNo: '',
+
+    FirstName: f.firstName,
+    MiddleName: f.middleName || '',
+    LastName: f.lastName || '',
+
+    FatherName: f.fatherName || '',
+    MotherName: f.motherName || '',
+
+    EnquiryForClassId: Number(f.enquiryClass),
+    StateId: Number(f.stateId || 0),
+    DistrictId: Number(f.districtId || 0),
+
+    GenderId: Number(f.gender),
+    EnquiryTypeId: Number(f.EnquiryTypeId),
+    CategoryId: Number(f.category || 0),
+    CasteId: Number(f.caste || 0),
+
+    StatusId: Number(f.enquiryStatus),
+    ReferenceRemark: f.referenceRemark || '',
+    Remark: f.remark || '',
+
+    ReminderDate: f.reminderDate,
+
+    MobileNo: f.mobile,
+    FatherMobileNo: f.fatherMobile,
+    EmailAddress: f.email || '',
+
+    Class10BoardName: f.tenthBoard || '',
+    Class10PercentageGrade: f.tenthPercentage || '',
+    Class12BoardName: f.twelfthBoard || '',
+    Class12PercentageGrade: f.twelfthPercentage || '',
+
+    Photo: this.updatedFileName || '',
+    AssignedTo: Number(f.assignTo || 0)
+  };
+}
+
+
   private async loadCommonMasters(): Promise<void> {
     const categoryRes = await this.enquiryService.GetCommonMasterData(1);
     if (categoryRes?.Status) {
@@ -215,7 +260,8 @@ export class EnquiryComponent implements OnInit {
       if(result.Status){
           this.previewUrl = this.FileSaveApiUrl + result.Result.FilePath;
           this.uploadedFileName = result.fileName || file.name;
-          //this.enquiryForm.profile = result.Result.FilePath;
+          this.updatedFileName = result.Result.FilePath || '';
+          this.toastr.success('File uploaded successfully');
       }
       else{
         this.toastr.error(result?.Message || 'Failed to Upload image');
@@ -234,19 +280,32 @@ debugger;
   // }
 
   const formValue = this.enquiryForm.value;
-
+  const payload = this.mapFormToEnquiryPayload();
   try {
     this.isLoading = true;
-    const res = await this.enquiryService.saveEnquiry(formValue);
+    // const res = await this.enquiryService.saveEnquiry(formValue);
 
-    console.log('API RESPONSE ', res);
+    // console.log('API RESPONSE ', res);
 
-    if (res?.Status) {
-      this.toastr.success('Enquiry saved successfully');
-      this.enquiryForm.reset();
-    } else {
-      this.toastr.error(res?.Message || 'Failed to save enquiry');
-    }
+    // if (res?.Status) {
+    //   this.toastr.success('Enquiry saved successfully');
+    //   this.enquiryForm.reset();
+    // } else {
+    //   this.toastr.error(res?.Message || 'Failed to save enquiry');
+    // }
+
+       await this.enquiryService.saveEnquiry(payload).subscribe((data: any) => {
+        data = JSON.parse(JSON.stringify(data));
+        if (data.Status == true) {
+          this.toastr.success('Enquiry saved successfully');
+          this.enquiryForm.reset();
+          //this.router.navigate(['/iti-center-observer']);
+          //this.GetById_Deployment(this.ApprenticeshipTeamID);
+        
+        } else {
+          this.toastr.error(data.ErrorMessage);
+        }
+      })
 
   } catch (error) {
     console.error('API ERROR ', error);

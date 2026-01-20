@@ -19,7 +19,6 @@ export class EnquiryService {
   private readonly EnquirySaveApiUrl: string;
   private readonly FileSaveApiUrl: string;
 
-
   constructor(
     private http: HttpClient,
     private appsettingConfig: AppsettingService
@@ -30,26 +29,16 @@ export class EnquiryService {
     this.FileSaveApiUrl = `${this.appsettingConfig.apiURL}CommonService`;
   }
 
-  /* ================= HEADERS ================= */
 
-  private get headersOptions() {
-    return {
-      headers: new HttpHeaders({
-        Accept: '*/*',
-        Authorization: `Bearer ${localStorage.getItem('authtoken') || ''}`
-      })
-    };
-  }
-
-  /* ================= COMMON ERROR HANDLER ================= */
 
   private handleError(error: any) {
     console.error('API Error:', error);
     return throwError(() => error);
   }
 
- 
-  /* ================= COMMON MASTER API ================= */
+  handleErrorObservable(error: Response | any) {
+    return throwError(error);
+  }
 
   async GetCommonMasterData(
     commonMasterId: number
@@ -76,8 +65,6 @@ export class EnquiryService {
         .pipe(catchError(this.handleError))
     );
   }
-
-  /* ================= UPDATE ENROLLMENT (IF NEEDED) ================= */
 
   async updateEnrollmentNo(
     request: PreExam_UpdateEnrollmentNoModel
@@ -109,29 +96,55 @@ export class EnquiryService {
 //   );
 // }
 
-async saveEnquiry(request: any): Promise<any> {
+// async saveEnquiry(request: any): Promise<any> {
 
-  const authHeader =
-    this.headersOptions?.headers?.get('Authorization');
+//   const authHeader =
+//     this.headersOptions?.headers?.get('Authorization');
 
-  console.log('Bearer Token:', authHeader);
+//   console.log('Bearer Token:', authHeader);
 
-  console.log('Request Payload:', request);
+//   console.log('Request Payload:', request);
 
-  return firstValueFrom(
-    this.http
-      .post<any>(
-        `${this.enquiryApiUrl}/create-new`,
-        request,
-        this.headersOptions
-      )
-      .pipe(catchError(this.handleError))
-  );
-}
+//   return firstValueFrom(
+//     this.http
+//       .post<any>(`${this.enquiryApiUrl}/create-new`, request, this.headersOptions )
+//       .pipe(catchError(this.handleError))
+//   );
+// }
 
- async upload(data: FormData): Promise<any> {
+  /** 🔐 Dynamic headers */
+  private get headersOptions() {
+    const token = localStorage.getItem('authtoken');
+
+    return {
+      headers: new HttpHeaders({
+        'Accept': '*/*',
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'no-loader': 'true'
+      })
+    };
+  }
+
+  /** ✅ Save Enquiry */
+  saveEnquiry(request: any) {
+    return this.http
+      .post(`${this.enquiryApiUrl}/create-new`, request, this.headersOptions)
+      .pipe(
+        catchError(this.handleErrorObservable)
+      );
+  }
+
+  async upload(data: FormData): Promise<any> {
+
+      const token = localStorage.getItem('authtoken');
+
+      const headers = new HttpHeaders({
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    'no-loader': 'true'
+    });
     return await firstValueFrom(
-      this.http.post<any>(`${this.FileSaveApiUrl}/FileUploader`, data, this.headersOptions)
+      this.http.post<any>(`${this.FileSaveApiUrl}/FileUploader`, data, { headers })
     );
   }
 
